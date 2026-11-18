@@ -28,3 +28,7 @@ venv/
 /packaging/python-release.json
 /project/screenshots/
 *.mp4
+
+# Local editor configuration
+.idea/
+.vscode/
