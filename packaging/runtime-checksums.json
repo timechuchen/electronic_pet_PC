@@ -1,0 +1,14 @@
+[
+  {
+    "file": "python-windows-x64.zip",
+    "bytes": 10941233,
+    "sha256": "76f238f606250c87c6beac75dccd35ee99070a13490555936abb6cb64ecce3d0",
+    "url": "https://www.python.org/ftp/python/3.13.12/python-3.13.12-embed-amd64.zip"
+  },
+  {
+    "file": "python-macos-arm64.tar.gz",
+    "bytes": 25237581,
+    "sha256": "2f11b8aa3726bdbd87dd9eb76568412faddf4f47e26913fa45d6a2e424972acd",
+    "url": "https://github.com/astral-sh/python-build-standalone/releases/download/20261110/cpython-3.12.16%2B20261110-aarch64-apple-darwin-install_only_stripped.tar.gz"
+  }
+]

@@ -1,0 +1,16 @@
+import { chromium } from 'playwright';
+const browser=await chromium.launch({channel:'chrome',headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1100},deviceScaleFactor:1});
+page.on('console',m=>console.log('BROWSER',m.type(),m.text().slice(0,400)));
+page.on('pageerror',e=>console.log('ERROR',e.message));
+await page.goto('http://127.0.0.1:8765');
+await page.waitForFunction(()=>window.petDiagnostics?.().danceDuration,{timeout:60000});
+console.log(JSON.stringify(await page.evaluate(()=>window.petDiagnostics())));
+await page.screenshot({path:'screenshots/idle.png',fullPage:true});
+await page.locator('[data-action=wave]').click();
+await page.waitForTimeout(1200);
+await page.screenshot({path:'screenshots/wave.png',fullPage:true});
+await page.locator('[data-action=dance]').click();
+await page.waitForTimeout(1600);
+await page.screenshot({path:'screenshots/dance.png',fullPage:true});
+await browser.close();

@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'">
+  <title>和兰洛聊聊</title><link rel="icon" href="data:,"><link rel="stylesheet" href="chat.css">
+</head>
+<body>
+  <header class="chat-header"><div class="avatar" aria-hidden="true">兰</div><div><h1>和兰洛聊聊</h1><p>今天的心情，也可以放在这里。</p></div><button id="settings-toggle" aria-expanded="false" aria-controls="connection-panel">连接设置</button></header>
+  <section id="connection-panel" class="connection-panel" aria-label="DeepSeek 连接设置" hidden>
+    <form id="settings-form">
+      <label for="api-key">DeepSeek API Key <span id="key-status">未保存</span></label>
+      <input id="api-key" type="password" placeholder="粘贴你的 API Key" autocomplete="off" spellcheck="false" maxlength="512">
+      <label for="model">对话模型</label><select id="model"><option value="deepseek-flash">DeepSeek Flash · 日常聊天</option><option value="deepseek-v4-pro">DeepSeek V4 Pro</option></select>
+      <label class="check"><input id="auto-speak" type="checkbox">自动朗读回复</label>
+      <p class="help">Key 由系统加密保存在这台电脑。发送消息时，最近 10 轮对话会发送到 DeepSeek，并使用你的账户额度。</p>
+      <div class="settings-actions"><button class="primary" type="submit" id="save-settings">保存设置</button><button type="button" id="test-key">测试连接</button><button type="button" id="remove-key">移除 Key</button></div>
+      <p class="help">语音使用系统中文声音；第一版支持文字输入和回复朗读。语音输入可使用系统听写。</p>
+    </form>
+  </section>
+  <main id="messages" class="messages" role="log" aria-label="聊天记录" aria-live="polite" aria-relevant="additions"></main>
+  <div class="feedback"><p id="status" role="status">正在连接桌宠…</p><p id="voice-status" role="status"></p><button id="stop-speech">停止朗读</button></div>
+  <footer>
+    <div class="conversation-tools"><span>聊天记录保存在本机</span><button id="clear-history">清空记录</button></div>
+    <form id="chat-form"><label for="message-input" class="sr-only">想对兰洛说的话</label><textarea id="message-input" rows="2" maxlength="1500" placeholder="想说什么都可以，从今天开始…" disabled></textarea><div class="composer-actions"><span>Enter 发送 · Shift + Enter 换行</span><button type="button" id="cancel-request" hidden>停止</button><button type="submit" class="primary" id="send-message" disabled>发送</button></div></form>
+    <p class="footnote">兰洛是 AI 伙伴，回复由 DeepSeek 生成。</p>
+  </footer>
+  <dialog id="clear-dialog"><h2>清空这段聊天？</h2><p>这会删除本机记录，兰洛也将从新的对话开始。</p><form method="dialog"><button value="cancel">保留记录</button><button value="clear" class="primary">清空记录</button></form></dialog>
+  <script type="module" src="chat-ui.js"></script>
+</body>
+</html>

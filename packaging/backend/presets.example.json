@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "selected": "relaxed",
+  "presets": [
+    {
+      "id": "relaxed",
+      "name": "安静陪伴",
+      "idle_action": "breath",
+      "expression": "neutral",
+      "speed": 1.0,
+      "auto_blink": true,
+      "music_action": "dance",
+      "music_threshold": 0.65,
+      "music_start_seconds": 1.5,
+      "music_stop_seconds": 3.0
+    },
+    {
+      "id": "cheerful",
+      "name": "轻松摇摆",
+      "idle_action": "sway",
+      "expression": "smile",
+      "speed": 1.0,
+      "auto_blink": true,
+      "music_action": "dance",
+      "music_threshold": 0.65,
+      "music_start_seconds": 1.5,
+      "music_stop_seconds": 3.0
+    },
+    {
+      "id": "curious",
+      "name": "好奇观察",
+      "idle_action": "look_around",
+      "expression": "neutral",
+      "speed": 1.0,
+      "auto_blink": true,
+      "music_action": "dance",
+      "music_threshold": 0.65,
+      "music_start_seconds": 1.5,
+      "music_stop_seconds": 3.0
+    }
+  ]
+}

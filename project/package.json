@@ -1,0 +1,22 @@
+{
+  "name": "lanluo-character-controller",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/copy-tracking-assets.mjs && esbuild web/src/main.js --bundle --minify --format=esm --outfile=web/app.js && esbuild web/src/tracking-worker.js --bundle --minify --format=iife --outfile=web/tracking-worker.js",
+    "test:ui": "node tests/browser.mjs",
+    "test:rig": "node tests/pose-rig.mjs",
+    "test:camera": "node tests/camera.mjs",
+    "test:presets": "node tests/presets-ui.mjs",
+    "test:desktop": "node tests/desktop-ui.mjs"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "0.10.32",
+    "@pixiv/three-vrm": "3.4.2",
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "playwright": "1.56.1"
+  }
+}

@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>兰洛 · 舞姿预览</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#fcfcf4,#e7f0e6 63%,#dde9e0)}
+#stage{position:fixed;inset:0}
+#loading{position:fixed;inset:0;display:grid;place-items:center;font:14px/1.6 -apple-system,"PingFang SC",sans-serif;color:#4b6256;background:#eaf1e8}#loading[hidden]{display:none}
+#caption{position:fixed;left:20px;bottom:18px;font:12px/1.5 -apple-system,"PingFang SC",sans-serif;color:#3d5a4a;background:#ffffffc8;border:1px solid #fff;border-radius:10px;padding:8px 12px}
+#caption b{font-size:18px;font-variant-numeric:tabular-nums}
+</style></head>
+<body><div id="stage"></div><div id="loading">载入兰洛…</div><div id="caption" hidden>t = <b id="t">0</b> s · <span id="pose-name"></span></div>
+<script type="module" src="app.js"></script></body></html>

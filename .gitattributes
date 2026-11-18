@@ -1,0 +1,24 @@
+* text=auto
+*.command text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.cjs text eol=lf
+*.mjs text eol=lf
+*.md text eol=lf
+*.png binary
+*.icns binary
+*.ico binary
+*.vrm binary
+*.fbx binary
+*.wasm binary
+*.task binary
+*.tflite binary
+**/web/app.js -diff -whitespace
+**/web/tracking-worker.js -diff -whitespace
+**/web/audio-worker.js -diff -whitespace
+
+# Preserve vendored and generated source formatting.
+**/web/audio/wasm/*.js -whitespace
+packaging/board_runtime/serial/** -whitespace
+packaging/board_runtime/pyserial-3.5.dist-info/** -whitespace
+project/tools/poser/app.js -diff -whitespace

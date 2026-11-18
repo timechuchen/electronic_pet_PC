@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>兰洛 · 互动空间</title><link rel="icon" href="data:,"><link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="desktop-bar" id="desktop-bar"><button id="desktop-drag" title="拖动兰洛" aria-label="拖动桌宠">拖动</button><button data-native="chat" title="和兰洛聊聊">聊天</button><button data-native="control" title="打开控制面板">设置</button><button data-native="top" title="切换置顶">置顶</button><button data-native="clickThrough" title="鼠标穿透；从菜单栏“兰”恢复">穿透</button><button data-native="close" title="退出桌宠">×</button></div>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="兰洛互动空间首页"><span class="brand-mark">L<span>·</span></span><span>兰洛<span class="brand-sub">互动空间</span></span></a>
+      <div class="local-badge"><button id="chat-open" hidden>和兰洛聊聊</button><span class="status-dot"></span>本地陪伴，随时回应</div>
+    </header>
+    <main>
+      <div class="page-heading"><div><p class="eyebrow">A LITTLE MOMENT TOGETHER</p><h1>让每个动作，都有回应<span>。</span></h1><p class="intro">打个招呼，眨眨眼。今天也和兰洛一起度过。</p></div><span class="edition">CHARACTER STUDIO <span>01</span></span></div>
+      <section class="companion-card" aria-label="预设与桌宠设置">
+        <div class="companion-heading"><div><h2>你的日常陪伴方式</h2><p id="music-status" role="status">选择待机预设，或让兰洛随着系统音乐跳舞。</p></div><div class="companion-buttons"><button id="music-toggle" disabled aria-pressed="false">开启音乐跟随</button><button id="desktop-open" disabled>打开独立桌宠 ↗</button></div></div>
+        <details id="preset-details"><summary>动作预设 <span id="preset-current">安静陪伴</span><span class="preset-format">JSON · 可保存 / 导入 / 导出</span></summary>
+          <div class="preset-grid">
+            <label>选择预设<select id="preset-select"></select></label>
+            <label>预设名称<input id="preset-name" maxlength="40" value="安静陪伴"></label>
+            <label>待机动作<select id="preset-idle"><option value="breath">自然呼吸</option><option value="sway">轻松摇摆</option><option value="look_around">左右观察</option><option value="wave">挥手</option><option value="nod">点头</option><option value="shake">摇头</option><option value="dance">街舞</option><option value="grace">轻舞</option><option value="jump">跳跃</option></select></label>
+            <label>默认表情<select id="preset-expression"><option value="neutral">自然</option><option value="smile">微笑</option></select></label>
+            <label>动作速度<input id="preset-speed" type="number" min="0.25" max="2" step="0.05" value="1"></label>
+            <label>听到音乐时<select id="preset-music"><option value="dance">跳街舞</option><option value="grace">跳轻舞</option><option value="sway">跟着摇摆</option><option value="wave">挥手</option><option value="jump">跳跃</option></select></label>
+            <label>音乐置信度阈值<input id="preset-threshold" type="number" min="0.2" max="0.95" step="0.05" value="0.65"></label>
+            <label class="preset-check"><input id="preset-blink" type="checkbox" checked>自然眨眼</label>
+          </div>
+          <div class="preset-footer"><button id="preset-save">保存并应用</button><button id="preset-copy">另存为新预设</button><button id="preset-export">导出 JSON</button><label class="file-button" for="preset-import">导入并应用<input id="preset-import" type="file" accept=".json,application/json"></label><span id="preset-feedback" role="status"></span></div>
+          <p class="preset-note">待机动作会循环。手动动作结束后恢复预设；音乐持续确认后触发，停止后恢复待机。导入 JSON 会替换预设列表。</p>
+        </details>
+      </section>
+      <section class="capture-toolbar" aria-label="摄像头动作跟随">
+        <div class="capture-intro"><span class="capture-symbol" aria-hidden="true">◎</span><div><h2>让兰洛跟着你动</h2><p id="camera-status" role="status">开启摄像头，模仿你的动作与表情。画面仅在本机处理。</p></div></div>
+        <button id="camera-toggle" class="camera-toggle" disabled>开启摄像头跟随</button>
+        <div class="capture-options" id="capture-options" hidden>
+          <label>摄像头 <select id="camera-device"><option value="">默认摄像头</option></select></label>
+          <label class="capture-check"><input id="camera-mirror" type="checkbox" checked>镜像跟随</label>
+          <label class="capture-check"><input id="camera-legs" type="checkbox">跟随腿部（需全身入镜）</label>
+          <button id="camera-calibrate" disabled>正面校准</button>
+          <span id="camera-metrics">等待识别</span>
+        </div>
+        <p class="capture-help" id="capture-help" hidden>面对镜头，让头、肩和双手入镜；头部正对镜头后可点“正面校准”。停止跟随后恢复按钮控制。</p>
+      </section>
+      <div class="workspace">
+        <section class="stage-card" aria-label="人物预览">
+          <div class="stage-heading"><span class="stage-name"><span class="status-dot" id="ready-dot"></span>兰洛 <span>/ LANLUO</span></span><span class="view-tag" id="view-tag">全身视角</span></div>
+          <div class="camera-preview" id="camera-preview" hidden><div class="camera-image"><video id="camera-video" autoplay playsinline muted></video><canvas id="camera-overlay" aria-hidden="true"></canvas></div><div class="camera-preview-label"><span class="status-dot"></span><span>本地实时预览</span><span id="tracking-quality">等待识别</span></div></div>
+          <div id="viewport" aria-label="可旋转和缩放的兰洛三维人物"></div>
+          <div id="loading" class="loading"><span class="spinner"></span><strong id="loading-title">兰洛正在准备见面</strong><span id="loading-detail">正在读取本地人物素材…</span><button id="retry" hidden>重新加载</button></div>
+          <div class="speech" id="speech">你好呀，很高兴见到你。</div>
+          <div class="view-tools" aria-label="视角控制"><button id="view-full" class="selected" aria-pressed="true">全身</button><button id="view-face" aria-pressed="false">特写</button><button id="view-reset" aria-label="恢复正面视角">回正</button></div>
+          <div class="stage-footer"><span><span class="tiny-cross">+</span> 拖动旋转 · 滚轮缩放</span><span id="render-status">正在载入</span></div>
+        </section>
+        <aside class="control-panel">
+          <div class="panel-heading"><div><p class="eyebrow">MAKE A CONNECTION</p><h2>和兰洛互动</h2></div><span class="live-pill" id="connection">连接中</span></div>
+          <p class="panel-description">选一个动作，看看兰洛的回应。</p>
+          <div class="action-grid" id="actions">
+            <button class="action-button" data-action="wave" disabled><span class="action-icon" data-icon="wave"></span><span class="action-text">挥挥手<small>和你打个招呼</small></span><kbd>1</kbd></button>
+            <button class="action-button" data-action="blink" disabled><span class="action-icon" data-icon="eye"></span><span class="action-text">眨眨眼<small>一瞬间的小默契</small></span><kbd>2</kbd></button>
+            <button class="action-button" data-action="wink" disabled><span class="action-icon" data-icon="wink"></span><span class="action-text">单眼眨眼<small>给你一个 wink</small></span><kbd>3</kbd></button>
+            <button class="action-button" data-action="smile" disabled><span class="action-icon" data-icon="smile"></span><span class="action-text">微笑<small>好心情传递中</small></span><kbd>4</kbd></button>
+            <button class="action-button" data-action="nod" disabled><span class="action-icon" data-icon="nod"></span><span class="action-text">点点头<small>嗯嗯，我在听</small></span><kbd>5</kbd></button>
+            <button class="action-button" data-action="shake" disabled><span class="action-icon" data-icon="shake"></span><span class="action-text">摇摇头<small>也有自己的想法</small></span><kbd>6</kbd></button>
+            <button class="action-button dance-button" data-action="dance" disabled><span class="action-icon" data-icon="music"></span><span class="action-text">街舞<small id="dance-detail">准备中…</small></span><kbd>7</kbd></button>
+            <div class="jump-row">
+              <button class="action-button jump-button" data-action="jump" disabled><span class="action-icon" data-icon="jump"></span><span class="action-text">跳一下<small>轻轻跃起</small></span><kbd>8</kbd></button>
+              <button class="action-button grace-button" data-action="grace" disabled><span class="action-icon" data-icon="feather"></span><span class="action-text">轻舞<small>原创 · 24 秒</small></span><kbd>9</kbd></button>
+            </div>
+          </div>
+          <div class="playback"><div class="playback-title"><span class="playing-indicator"></span><span id="action-status" role="status" aria-live="polite">等待人物加载</span><span id="action-time">—</span></div><div class="progress-track"><div id="progress"></div></div><div class="playback-buttons"><button id="pause" disabled><span data-icon="pause"></span><span id="pause-label">暂停</span></button><button id="reset" disabled><span data-icon="reset"></span>恢复待机</button></div></div>
+          <div class="settings"><label class="speed-label" for="speed">动作速度 <output id="speed-value">1.0×</output></label><input id="speed" type="range" min="0.25" max="2" step="0.05" value="1" aria-label="动作播放速度"><div class="range-marks"><span>慢一点</span><span>快一点</span></div><div class="toggle-row"><label for="loop">循环当前动作</label><input id="loop" type="checkbox" role="switch"></div><div class="toggle-row"><label for="auto-blink">自然眨眼</label><input id="auto-blink" type="checkbox" role="switch" checked></div><div class="toggle-row"><label for="idle-motion">待机呼吸</label><input id="idle-motion" type="checkbox" role="switch" checked></div></div>
+          <details id="asset-library" class="action-library">
+            <summary>模型与 FBX 动作 <span>自定义导入</span></summary>
+            <p class="action-library-help">导入 VRM 0.x / 1.0 人形模型，应用后作为默认角色。素材仅保存在本机，单文件最大 128 MB。</p>
+            <label class="asset-field" for="model-select">角色模型<select id="model-select"><option value="builtin">兰洛（内置）</option></select></label>
+            <div class="action-library-tools">
+              <label class="file-button" for="model-import">导入 VRM<input id="model-import" type="file" accept=".vrm" aria-describedby="asset-status"></label>
+              <button id="model-apply" type="button">应用模型</button><button id="model-default" type="button">恢复兰洛</button><button id="model-remove" type="button" disabled>移除模型</button>
+            </div>
+            <hr>
+            <p class="action-library-help">导入含人形骨骼动画的 FBX。自动识别 Mixamo 等常见名称；其他骨架可手动指定对应关系。非人形动画无法直接用于 VRM。</p>
+            <div class="action-library-tools"><label class="file-button" for="fbx-import">导入 FBX 动作<input id="fbx-import" type="file" accept=".fbx" aria-describedby="asset-status"></label></div>
+            <div id="fbx-import-options" hidden>
+              <label class="asset-field" for="fbx-clip">选择动作片段<select id="fbx-clip"></select></label>
+              <label class="asset-checkbox"><input id="fbx-in-place" type="checkbox" checked>原地播放（保留跳跃高度）</label>
+              <details id="fbx-mapping-details"><summary>骨骼映射（标准骨骼 → FBX 骨骼）</summary><p class="action-library-help">只需映射动作使用的骨骼；每根源骨骼只能使用一次。若姿态扭曲，请检查左右肢体与静止姿态，建议导出 T 姿态骨架及烘焙动画。</p><div id="fbx-mapping"></div></details>
+              <div class="action-library-tools"><button id="fbx-save" type="button">保存 FBX 动作</button><button id="fbx-cancel" type="button">取消</button></div>
+            </div>
+            <p id="asset-status" role="status" aria-live="polite">支持保存 16 个模型和 64 个 FBX 动作片段。</p>
+            <p id="fbx-empty" class="action-library-help">尚未导入 FBX 动作。</p><div id="fbx-list"></div>
+          </details>
+          <details class="action-library" id="action-library">
+            <summary>添加新动作 <span id="custom-action-count">0 / 32</span></summary>
+            <p class="action-library-help">导入动作 JSON 后点击播放。相同 id 会更新已有动作，其他动作会保留。</p>
+            <div class="action-library-tools">
+              <label class="file-button" for="action-library-import">导入动作 JSON<input id="action-library-import" type="file" accept=".json,application/json" aria-describedby="action-library-status"></label>
+              <button id="action-library-template" type="button">下载跳跃示例</button>
+              <button id="action-library-export" type="button" disabled>导出动作库</button>
+            </div>
+            <p id="action-library-status" role="status" aria-live="polite"></p>
+            <p id="custom-action-empty">还没有自定义动作。先下载示例，改名后导入试试。</p>
+            <div id="custom-action-list"></div>
+          </details>
+          <p class="keyboard-note">快捷键 <kbd>1</kbd>–<kbd>8</kbd> 互动 <span>·</span> <kbd>空格</kbd> 暂停 <span>·</span> <kbd>Esc</kbd> 复位</p>
+        </aside>
+      </div>
+      <footer class="page-footer"><span>一点陪伴，一点小小的快乐。</span><span>LANLUO <span class="footer-star">✳</span> YOUR EVERYDAY COMPANION</span></footer>
+    </main>
+  </div>
+  <div id="toast" role="alert" hidden></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+{
+  "version": 1,
+  "actions": [
+    {
+      "id": "custom_hop",
+      "name": "轻轻一跳",
+      "duration": 1.8,
+      "keyframes": [
+        {
+          "time": 0,
+          "lift": 0,
+          "bones": {}
+        },
+        {
+          "time": 0.3,
+          "lift": -0.035,
+          "bones": {
+            "leftUpperLeg": [
+              -28,
+              0,
+              0
+            ],
+            "rightUpperLeg": [
+              -28,
+              0,
+              0
+            ],
+            "leftLowerLeg": [
+              56,
+              0,
+              0
+            ],
+            "rightLowerLeg": [
+              56,
+              0,
+              0
+            ],
+            "leftFoot": [
+              -28,
+              0,
+              0
+            ],
+            "rightFoot": [
+              -28,
+              0,
+              0
+            ],
+            "spine": [
+              9,
+              0,
+              0
+            ],
+            "leftUpperArm": [
+              18,
+              0,
+              0
+            ],
+            "rightUpperArm": [
+              18,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "time": 0.5,
+          "lift": 0.025,
+          "bones": {
+            "leftUpperArm": [
+              -35,
+              0,
+              -24
+            ],
+            "rightUpperArm": [
+              -35,
+              0,
+              24
+            ]
+          }
+        },
+        {
+          "time": 0.8,
+          "lift": 0.15,
+          "bones": {
+            "leftUpperArm": [
+              -48,
+              0,
+              -38
+            ],
+            "rightUpperArm": [
+              -48,
+              0,
+              38
+            ],
+            "leftUpperLeg": [
+              -12,
+              0,
+              0
+            ],
+            "rightUpperLeg": [
+              -12,
+              0,
+              0
+            ],
+            "leftLowerLeg": [
+              24,
+              0,
+              0
+            ],
+            "rightLowerLeg": [
+              24,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "time": 1.12,
+          "lift": 0,
+          "bones": {}
+        },
+        {
+          "time": 1.28,
+          "lift": -0.025,
+          "bones": {
+            "leftUpperLeg": [
+              -22,
+              0,
+              0
+            ],
+            "rightUpperLeg": [
+              -22,
+              0,
+              0
+            ],
+            "leftLowerLeg": [
+              44,
+              0,
+              0
+            ],
+            "rightLowerLeg": [
+              44,
+              0,
+              0
+            ],
+            "leftFoot": [
+              -22,
+              0,
+              0
+            ],
+            "rightFoot": [
+              -22,
+              0,
+              0
+            ],
+            "spine": [
+              6,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "time": 1.65,
+          "lift": 0,
+          "bones": {}
+        },
+        {
+          "time": 1.8,
+          "lift": 0,
+          "bones": {}
+        }
+      ]
+    }
+  ]
+}
