@@ -8,6 +8,7 @@ import { CameraCapture } from './capture.js';
 import { PoseRig, faceExpressions } from './pose-rig.js';
 import { initActionLibrary, updateActionLibrary } from './custom-actions.js';
 import {initChatPet, speechMouth} from './chat-pet.js';
+import { createDesktopShadow, initShadowControls, watchDesktopShadow } from './desktop-shadow.js';
 
 const $ = id => document.getElementById(id);
 const boardMode=new URLSearchParams(location.search).get('board')==='1';
@@ -34,6 +35,7 @@ document.querySelectorAll('[data-icon]').forEach(el => {
 const names = {wave:'挥手',blink:'眨眼',wink:'单眼眨眼',smile:'微笑',nod:'点头',shake:'摇头',dance:'街舞',jump:'跳跃',grace:'轻舞'};
 const messages = {wave:'嗨！今天过得怎么样？',blink:'眨眨眼，把疲惫都赶走。',wink:'这是只属于我们的小默契。',smile:'见到你，就有好心情。',nod:'嗯嗯，我在认真听呢。',shake:'唔，让我再想一想。',dance:'跟着节奏，一起放松一下吧！',grace:'这支舞，只为你一个人跳。'};
 let config, state, vrm, danceSamplers, danceClip, renderer, scene, camera, controls;
+let desktopShadow;
 let ready = false, connected = false, danceError = false, toastTimer, speechTimer, height=1.6;
 let events, lastFrame = performance.now(), capture, poseRig;
 let characterBaseY=0, loadedModelId=null, requestedModelId=null, modelSequence=0;
@@ -133,12 +135,19 @@ function cameraView(close=false) {
   $('view-full').classList.toggle('selected',!close);$('view-face').classList.toggle('selected',close);
   $('view-full').setAttribute('aria-pressed',String(!close));$('view-face').setAttribute('aria-pressed',String(close));
 }
+function useUnlitBaseColor(shader) {
+  // Keep the glTF material and its VRM expression bindings, but output its authored color.
+  shader.fragmentShader=shader.fragmentShader.replace(
+    '#include <opaque_fragment>',
+    'outgoingLight = diffuseColor.rgb + totalEmissiveRadiance;\n#include <opaque_fragment>'
+  );
+}
 function createScene() {
   const host=$('viewport');
   renderer=new THREE.WebGLRenderer({antialias:true,alpha:!boardMode,preserveDrawingBuffer:boardMode,powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   renderer.outputColorSpace=THREE.SRGBColorSpace;
-  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.35;
+  renderer.toneMapping=THREE.NoToneMapping;
   if(boardMode)renderer.setClearColor(0x000000,1);
   host.appendChild(renderer.domElement);
   if(boardMode)window.boardJPEG=()=>{renderer.render(scene,camera);return renderer.domElement.toDataURL('image/jpeg',0.78).split(',')[1];};
@@ -148,16 +157,16 @@ function createScene() {
   controls=new OrbitControls(camera,renderer.domElement);
   controls.enableDamping=true;controls.dampingFactor=.08;controls.enablePan=false;
   controls.minDistance=.4;controls.maxDistance=8;controls.maxPolarAngle=Math.PI*.57;
-  scene.add(new THREE.HemisphereLight(0xfffaf0,0xb4c8c0,2.3));
-  const key=new THREE.DirectionalLight(0xfff9ed,2.2);key.position.set(2,4,4);scene.add(key);
-  const fill=new THREE.DirectionalLight(0xd5e7ff,1);fill.position.set(-3,2,-2);scene.add(fill);
-  // A soft contact shadow: generated canvas texture, no external image assets.
-  const shadowCanvas=document.createElement('canvas');shadowCanvas.width=shadowCanvas.height=128;
-  const ctx=shadowCanvas.getContext('2d');const gradient=ctx.createRadialGradient(64,64,0,64,64,64);
-  gradient.addColorStop(0,'rgba(61,89,66,0.20)');gradient.addColorStop(.45,'rgba(61,89,66,0.10)');gradient.addColorStop(1,'rgba(61,89,66,0)');ctx.fillStyle=gradient;ctx.fillRect(0,0,128,128);
-  const shadow=new THREE.Mesh(new THREE.PlaneGeometry(1.2,.8),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowCanvas),transparent:true,depthWrite:false}));
-  shadow.rotation.x=-Math.PI/2;shadow.position.y=.005;if(!desktopMode)scene.add(shadow);
-  const resize=new ResizeObserver(()=>{const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();});resize.observe(host);
+  // MToon's Lambert factor is 1/π, so this uniform white ambient returns the base color.
+  scene.add(new THREE.AmbientLight(0xffffff,Math.PI));
+  if(desktopMode&&!boardMode){
+    desktopShadow=createDesktopShadow(renderer,scene);
+    watchDesktopShadow(window.lanluoDesktop,desktopShadow.apply)?.catch(console.error);
+  }
+  const resize=new ResizeObserver(()=>{
+    const w=host.clientWidth,h=host.clientHeight;
+    renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();
+  });resize.observe(host);
   renderer.domElement.addEventListener('webglcontextlost',event=>{event.preventDefault();ready=false;refreshEnabled();toast('图形上下文已中断，请刷新页面恢复。');});
   cameraView();
 }
@@ -168,7 +177,15 @@ async function loadCharacter(url=config.model,id=config.model_id) {
   const next=await readVRM(await response.arrayBuffer());
   if(sequence!==modelSequence){VRMUtils.deepDispose(next.scene);return;}
   VRMUtils.rotateVRM0(next);
-  next.scene.traverse(object=>{object.frustumCulled=false;});
+  next.scene.traverse(object=>{
+    object.frustumCulled=false;
+    if(object.isLight)object.intensity=0;
+    if(object.isMesh&&desktopShadow)object.castShadow=true;
+    const materials=Array.isArray(object.material)?object.material:[object.material];
+    for(const material of materials){
+      if(material?.isMeshStandardMaterial)material.onBeforeCompile=useUnlitBaseColor;
+    }
+  });
   next.update(0);next.scene.updateMatrixWorld(true);
   const bounds=new THREE.Box3().setFromObject(next.scene);
   const size=bounds.getSize(new THREE.Vector3());
@@ -181,7 +198,9 @@ async function loadCharacter(url=config.model,id=config.model_id) {
   vrm.scene.position.z-=(bounds.min.z+bounds.max.z)/2;
   vrm.scene.position.y-=bounds.min.y;
   characterBaseY=vrm.scene.position.y;
-  scene.add(vrm.scene);targets.clear();
+  scene.add(vrm.scene);
+  desktopShadow?.resize(height);
+  targets.clear();
   for(const key of Object.keys(expressionValues))delete expressionValues[key];
   fbxClips.clear();fbxPending.clear();fbxErrors.clear();danceClip=null;danceSamplers=null;danceError=false;
   for(const [name,bone] of Object.entries(vrm.humanoid.normalizedHumanBones))targets.set(name,{node:bone.node,current:bone.node.quaternion.clone()});
@@ -243,6 +262,7 @@ async function start() {
   try {
     const response=await fetch('/api/config');if(!response.ok)throw new Error('无法连接 Python 服务');config=await response.json();
     createScene();requestAnimationFrame(animate);
+    if(!desktopMode)initShadowControls(toast);
     await initCompanion(()=>config,toast);
     await initActionLibrary(()=>config,refreshEnabled);
     events=new EventSource('/api/events');

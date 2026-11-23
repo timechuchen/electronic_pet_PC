@@ -70,6 +70,16 @@
           </div>
           <div class="playback"><div class="playback-title"><span class="playing-indicator"></span><span id="action-status" role="status" aria-live="polite">等待人物加载</span><span id="action-time">—</span></div><div class="progress-track"><div id="progress"></div></div><div class="playback-buttons"><button id="pause" disabled><span data-icon="pause"></span><span id="pause-label">暂停</span></button><button id="reset" disabled><span data-icon="reset"></span>恢复待机</button></div></div>
           <div class="settings"><label class="speed-label" for="speed">动作速度 <output id="speed-value">1.0×</output></label><input id="speed" type="range" min="0.25" max="2" step="0.05" value="1" aria-label="动作播放速度"><div class="range-marks"><span>慢一点</span><span>快一点</span></div><div class="toggle-row"><label for="loop">循环当前动作</label><input id="loop" type="checkbox" role="switch"></div><div class="toggle-row"><label for="auto-blink">自然眨眼</label><input id="auto-blink" type="checkbox" role="switch" checked></div><div class="toggle-row"><label for="idle-motion">待机呼吸</label><input id="idle-motion" type="checkbox" role="switch" checked></div></div>
+          <details id="desktop-shadow-settings" class="action-library" hidden>
+            <summary>桌宠阴影</summary>
+            <div class="toggle-row"><label for="shadow-enabled">显示阴影</label><input id="shadow-enabled" type="checkbox" role="switch"></div>
+            <label class="speed-label" for="shadow-direction">阴影方向 <output id="shadow-direction-value" for="shadow-direction"></output></label>
+            <input id="shadow-direction" type="range" min="0" max="359" step="1" aria-describedby="shadow-direction-hint">
+            <div class="range-marks" id="shadow-direction-hint"><span>0° 右</span><span>90° 前</span><span>180° 左</span><span>270° 后</span><span>359° 右</span></div>
+            <label class="speed-label" for="shadow-elevation">太阳高度 <output id="shadow-elevation-value" for="shadow-elevation"></output></label>
+            <input id="shadow-elevation" type="range" min="25" max="85" step="1" aria-describedby="shadow-elevation-hint">
+            <div class="range-marks" id="shadow-elevation-hint"><span>低 · 阴影长</span><span>高 · 阴影短</span></div>
+          </details>
           <details id="asset-library" class="action-library">
             <summary>模型与 FBX 动作 <span>自定义导入</span></summary>
             <p class="action-library-help">导入 VRM 0.x / 1.0 人形模型，应用后作为默认角色。素材仅保存在本机，单文件最大 128 MB。</p>

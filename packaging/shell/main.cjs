@@ -24,6 +24,32 @@ function trusted(event,window){return !!window&&!window.isDestroyed()&&event.sen
 async function api(route,body){const response=await fetch(baseURL+route,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json','X-Pet-Token':nativeToken}:{'X-Pet-Token':nativeToken},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(5000)});if(!response.ok)throw new Error(`本机服务返回 ${response.status}`);return response.json();}
 function preferences(){try{return JSON.parse(fs.readFileSync(path.join(app.getPath('userData'),'window.json'),'utf8'));}catch{return {};}}
 function saveWindow(){if(!pet||pet.isDestroyed())return;fs.writeFileSync(path.join(app.getPath('userData'),'window.json'),JSON.stringify({...preferences(),bounds:pet.getBounds(),top:pet.isAlwaysOnTop()}));}
+function validDirection(value){return Number.isInteger(value)&&value>=0&&value<=359;}
+function validElevation(value){return Number.isInteger(value)&&value>=25&&value<=85;}
+function shadowSettings(pref=preferences()){
+ const saved=pref.desktopShadow;
+ return {
+  enabled:typeof saved?.enabled==='boolean'?saved.enabled:pref.reflectionEnabled!==false,
+  direction:validDirection(saved?.direction)?saved.direction:30,
+  elevation:validElevation(saved?.elevation)?saved.elevation:67,
+ };
+}
+function setShadowSettings(changes){
+ const pref=preferences();
+ const next={...shadowSettings(pref),...changes};
+ if(typeof next.enabled!=='boolean'||!validDirection(next.direction)||!validElevation(next.elevation))throw new Error('阴影参数超出范围');
+ const {enabled,direction,elevation}=next;
+ const settingsValue={enabled,direction,elevation};
+ fs.writeFileSync(path.join(app.getPath('userData'),'window.json'),JSON.stringify({...pref,desktopShadow:settingsValue}));
+ for(const win of [pet,settings])if(win&&!win.isDestroyed())win.webContents.send('pet-shadow-changed',settingsValue);
+ if(tray&&!tray.isDestroyed())tray.setContextMenu(petMenu());
+ return settingsValue;
+}
+ipcMain.handle('pet-shadow-settings',event=>trusted(event,pet)||trusted(event,settings)?shadowSettings():null);
+ipcMain.handle('pet-shadow-set',(event,changes)=>{
+ if(!trusted(event,settings))throw new Error('此窗口不能修改阴影设置');
+ return setShadowSettings(changes);
+});
 function windowOptions(extra={}){return{show:false,webPreferences:{preload:path.join(__dirname,'preload.cjs'),nodeIntegration:false,contextIsolation:true,sandbox:true,backgroundThrottling:false,session:bridgeSession},...extra};}
 function secure(window){window.webContents.setWindowOpenHandler(()=>({action:'deny'}));window.webContents.on('will-navigate',(event,url)=>{if(!localURL(url))event.preventDefault();});}
 function openSettings(){
@@ -69,6 +95,7 @@ function petMenu(){return Menu.buildFromTemplate([
  {label:'查看开发板预览',click:()=>boardWindow?.show()},
  {label:'和兰洛聊聊…',click:openChat},
  {label:'设置…',click:openSettings},{label:'显示桌宠',click:()=>{pet.show();pet.focus();}},
+ {id:'desktop-shadow',label:'显示阴影',type:'checkbox',checked:shadowSettings().enabled,click:item=>setShadowSettings({enabled:item.checked})},
  {label:'始终置顶',type:'checkbox',checked:pet.isAlwaysOnTop(),click:item=>{pet.setAlwaysOnTop(item.checked);saveWindow();}},
  {label:'鼠标穿透（从此菜单恢复）',type:'checkbox',checked:!!pet.clickThrough,click:item=>{pet.clickThrough=item.checked;pet.setIgnoreMouseEvents(item.checked,{forward:true});}},
  {type:'separator'},{label:'退出桌宠',click:()=>app.quit()},
